@@ -1,36 +1,23 @@
-square = nil
-block = {}
-block.position = {x=0,y=0}
-block.squares = {}
-block.squares[1] = {x=0,y=0}
+--Require sekce
+require "data/control" --main game control file
 
-function block.draw_block()
-	for num,sq_pos in ipairs(block.squares) do
-		love.graphics.draw(square,block.position.x + sq_pos.x,block.position.y + sq_pos.y)	
-	end
-end
+--basic vars
+wWidth = 480
+wHeight = 854
 
 function love.load()
-	square = love.graphics.newImage("pngs/tetris_block.png")
+	love.window.setMode(wWidth,wHeight,{vsync=true})  --default graphics settings / 16:9 asp.r.
+	control.load()
 end
 
-function love.keypressed(key)
-	if key == "left" then
-		block.position.x = block.position.x - square_dimension
-	end
-	if key == "right" then
-		block.position.x = block.position.x + square_dimension
-	end
+function love.update(dt) 	--default love2d loop use control update loop
+	control.update(dt)
 end
 
-function love.update(dt)
-	if (block.position.y >= (window_height_in_squares - 1) * square_dimension) then
-		block.position.y = block.position.y
-	else
-		block.position.y = block.position.y + fall_speed * dt
-	end
+function love.draw()  --default love2d loop use control draw loop
+	control.draw()
 end
 
-function love.draw(dt)
-	block.draw_block()
+function love.keypressed(key)  --default love2d input handler use control input hanler
+	control.input(key)
 end
