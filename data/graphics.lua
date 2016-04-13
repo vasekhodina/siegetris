@@ -17,9 +17,12 @@ graphics.drawBoard = function()
 		end
 	end
 	
-	if tile then
+	if block then
 		--if tile.y >= 1 then
-			love.graphics.rectangle("fill",tile.x*t+xcor-t,tile.y*t+ycor-t,t,t)
+			local i=1
+			for i=1,4 do
+				love.graphics.rectangle("fill",block[i].x*t+xcor-t,block[i].y*t+ycor-t,t,t)
+			end
 		--end
 	end
 end

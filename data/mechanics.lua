@@ -3,13 +3,13 @@ mechanics = {}
 mechanics.fallCounter = 0
 mechanics.tileType = {}
 local t = mechanics.tileType
-t["I"]= 0
-t["O"]= 0
-t["L"]= 0
-t["J"]= 0
-t["Z"]= 0
-t["S"]= 0
-t["T"]= 0
+t["I"]= {{0,0},{0,1},{0,2},{0,3}}
+t["O"]= {{0,0},{0,1},{1,0},{1,1}}
+t["L"]= {{0,0},{0,1},{0,2},{1,2}}
+t["J"]= {{1,0},{1,1},{1,2},{0,2}}
+t["Z"]= {{1,0},{1,1},{0,1},{0,2}}
+t["S"]= {{0,0},{0,1},{1,1},{1,2}}
+t["T"]= {{0,0},{0,1},{1,1},{0,2}}
 
 mechanics.createBoard = function()
 	board = {}
@@ -21,15 +21,27 @@ mechanics.createBoard = function()
 	end
 end
 
-mechanics.newTile = function()
+mechanics.newTile = function(offset,start)
+	xoff = offset[1]
+	yoff = offset[2]
 	tile = {}
-	tile.x = love.math.random(1,boardSize[1])
-	tile.y = -1
+	tile.x = start+xoff
+	tile.y = -3+yoff
+	return tile
+end
+
+mechanics.newBlock = function(blockName)
+	startPos = love.math.random(1,boardSize[1])
+	block = {}
+	local i=1
+	for i=1,4 do
+		block[i] = mechanics.newTile(t[blockName][i],startPos)
+	end
 end
 
 mechanics.fallTile = function(dt)
 	
-	if tile then
+	if block then
 		if love.keyboard.isDown("down") then 					--TODO nastavit na libovolnou ovaldaci klavesu
 			mechanics.fallCounter = mechanics.fallCounter+dt*5 	--5x rychlejsi pohyb
 		else
@@ -38,17 +50,24 @@ mechanics.fallTile = function(dt)
 
 		if mechanics.fallCounter>1 then
 			mechanics.checkStop()
-			if tile then
-				tile.y = tile.y+1
-				mechanics.fallCounter = 0
+			local i=1
+			for i=1,4 do
+				if block then
+					block[i].y = block[i].y+1
+					mechanics.fallCounter = 0
+				end
 			end
 		end
 	end
 end
 
 mechanics.moveTileLeft = function()
-	if tile and tile.x>1 then
-		tile.x = tile.x-1
+	local i=1
+	local movable = false
+	for i=1,4 do
+		if block and block[i].x>1 then
+			tile.x = tile.x-1
+		end
 	end
 end
 

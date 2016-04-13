@@ -30,7 +30,7 @@ control.draw = function()
 end
 
 control.input = function(key)
-	if key == "space" then mechanics.newTile()
+	if key == "space" then mechanics.newBlock("L")
 	elseif key == "left" then mechanics.moveTileLeft()
 	elseif key == "right" then mechanics.moveTileRight()
 	end
