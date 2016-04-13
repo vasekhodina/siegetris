@@ -14,6 +14,9 @@ graphics.drawBoard = function()
 		for j=1,boardSize[2] do
 			love.graphics.print(board[i][j],i*t-t+xcor+10,j*t-t+ycor+10) --test
 			love.graphics.rectangle("line",i*t-t+xcor,j*t-t+ycor,t,t) --test
+			if board[i][j]==1 then
+			love.graphics.rectangle("fill",i*t-t+xcor,j*t-t+ycor,t,t)
+			end
 		end
 	end
 	
@@ -25,6 +28,8 @@ graphics.drawBoard = function()
 			end
 		--end
 	end
+	
+	love.graphics.print(console,10,10)
 end
 
 graphics.loadPics = function()

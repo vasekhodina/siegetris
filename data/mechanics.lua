@@ -1,7 +1,9 @@
 
 mechanics = {}
 mechanics.fallCounter = 0
+mechanics.blockGeneration = false
 mechanics.tileType = {}
+mechanics.tileNames = {"I","O","L","J","S","Z","T"} --7 vals
 local t = mechanics.tileType
 t["I"]= {{0,0},{0,1},{0,2},{0,3}}
 t["O"]= {{0,0},{0,1},{1,0},{1,1}}
@@ -31,18 +33,28 @@ mechanics.newTile = function(offset,start)
 end
 
 mechanics.newBlock = function(blockName)
-	startPos = love.math.random(1,boardSize[1])
-	block = {}
-	local i=1
-	for i=1,4 do
-		block[i] = mechanics.newTile(t[blockName][i],startPos)
+	mechanics.blockGeneration = true
+	while mechanics.blockGeneration do 
+		startPos = love.math.random(1,boardSize[1])
+		block = {}
+		local i=1
+		for i=1,4 do
+			block[i] = mechanics.newTile(t[blockName][i],startPos)
+		end
+		
+		for i=1,4 do
+			if block[i].x>1 and block[i].x<boardSize[1] then
+				mechanics.blockGeneration = false
+			else
+				mechanics.blockGeneration = true
+			end
+		end
 	end
 end
 
 mechanics.fallTile = function(dt)
-	
 	if block then
-		if love.keyboard.isDown("down") then 					--TODO nastavit na libovolnou ovaldaci klavesu
+		if love.keyboard.isDown("down") then 					--TODO nastavit na libovolnou ovladaci klavesu
 			mechanics.fallCounter = mechanics.fallCounter+dt*5 	--5x rychlejsi pohyb
 		else
 			mechanics.fallCounter = mechanics.fallCounter+dt
@@ -61,30 +73,67 @@ mechanics.fallTile = function(dt)
 	end
 end
 
-mechanics.moveTileLeft = function()
+mechanics.moveBlockLeft = function()
 	local i=1
-	local movable = false
+	local movable = 1
 	for i=1,4 do
-		if block and block[i].x>1 then
-			tile.x = tile.x-1
+		if block and block[i].x>1 and board[block[i].x-1][block[i].y]==0 then
+			movable = movable*1
+		else
+			movable = movable*0
+		end
+	end
+	
+	if movable==1 then
+		for i=1,4 do
+			block[i].x = block[i].x-1
 		end
 	end
 end
 
-mechanics.moveTileRight = function()
-	if tile and tile.x<boardSize[1] then
-		tile.x = tile.x+1
+mechanics.moveBlockRight = function()
+	local i=1
+	local movable = 1
+	for i=1,4 do
+		if block and block[i].x<boardSize[1] and board[block[i].x+1][block[i].y]==0 then
+			movable = movable*1
+		else
+			movable = movable*0
+		end
+	end
+	
+	if movable==1 then
+		for i=1,4 do
+			block[i].x = block[i].x+1
+		end
 	end
 end
 
 mechanics.checkStop = function()
-	if tile and tile.y+1 > boardSize[2] then
-		board[tile.x][tile.y] = 1
-		tile = nil			
+	local i=1
+	for i=1,4 do
+		if block and block[i].y+1 > boardSize[2] then
+			local n=1
+			for n=1,4 do board[block[n].x][block[n].y] = 1 end
+			mechanics.newBlock(mechanics.tileNames[love.math.random(1,7)])
+		end
+			
+		if block and board[block[i].x][block[i].y+1]==1 then
+			local n=1
+			for n=1,4 do board[block[n].x][block[n].y] = 1 end
+			mechanics.newBlock(mechanics.tileNames[love.math.random(1,7)])
+		end
 	end
-		
-	if tile and board[tile.x][tile.y+1]==1 then
-		board[tile.x][tile.y] = 1
-		tile = nil
+end
+
+mechanics.rotateBlock = function()
+	local i=1
+	for i=1,4 do
+		if block then
+			local valx = block[i].x
+			local valy = block[i].y
+			block[i].x = valy
+			block[i].y = valx
+		end
 	end
 end
